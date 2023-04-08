@@ -44,7 +44,7 @@ async fn handler(login: &str, owner: &str, repo: &str, payload: EventPayload) {
     let octocrab = get_octo(Some(String::from(login)));
 
     let now = Utc::now();
-    let a_week_ago = now - chrono::Duration::days(7);
+    let a_week_ago = now - chrono::Duration::days(15);
     let a_week_ago_formatted = a_week_ago.format("%Y-%m-%d").to_string();
     let query = format!(
         "repo:{owner}/{repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"

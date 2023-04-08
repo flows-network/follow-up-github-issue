@@ -9,14 +9,12 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-urlencoding = "2.1.2"
 chrono = "0.4.24"
+dotenv = "0.15.0"
 flowsnet-platform-sdk = "0.1.1"
 github-flows = "0.4.0"
-http_req_wasi = { version = "0.10.2" }
-openai-flows = "0.4.1"
-schedule-flows = "0.1.10"
+http_req_wasi = { version = "0.10.2" , features = ["wasmedge_ssl"]}
 serde = { version = "1.0.159", features = ["derive"] }
 serde_json = "1.0.93"
-# serde_urlencoded = "0.7.1"
 slack-flows = "0.2.6"
+tokio_wasi = {version = "1.25.1", features = ["full"] }

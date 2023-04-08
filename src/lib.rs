@@ -1,18 +1,20 @@
-use chrono::{DateTime, Datelike, Duration, Utc};
+use chrono::{Duration, Utc};
 use dotenv::dotenv;
-use github_flows::{
-    get_octo, listen_to_event, octocrab::models::events::payload::PullRequestEventAction,
-    EventPayload,
-};
-use http_req::uri::Uri;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use github_flows::get_octo;
+use schedule_flows::schedule_cron_job;
 use slack_flows::send_message_to_channel;
 use std::env;
 
 #[no_mangle]
+pub fn run() {
+    schedule_cron_job(
+        String::from("05 * * * *"),
+        String::from("cron_job_evoked"),
+        callback,
+    );
+}
 #[tokio::main(flavor = "current_thread")]
-pub async fn run() {
+async fn callback(_body: Vec<u8>) {
     dotenv().ok();
 
     let login: String = match env::var("login") {
@@ -30,21 +32,10 @@ pub async fn run() {
         Ok(name) => name,
     };
 
-    listen_to_event(
-        &login,
-        &owner,
-        &repo,
-        vec!["pull_request", "issues", "issue_comment"],
-        |payload| handler(&login, &owner, &repo, payload),
-    )
-    .await;
-}
-
-async fn handler(login: &str, owner: &str, repo: &str, payload: EventPayload) {
     let octocrab = get_octo(Some(String::from(login)));
 
     let now = Utc::now();
-    let a_week_ago = now - chrono::Duration::days(15);
+    let a_week_ago = now - chrono::Duration::days(10);
     let a_week_ago_formatted = a_week_ago.format("%Y-%m-%d").to_string();
     let query = format!(
         "repo:{owner}/{repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"
@@ -72,6 +63,6 @@ async fn handler(login: &str, owner: &str, repo: &str, payload: EventPayload) {
                 send_message_to_channel("ik8", "ch_out", msg);
             }
         }
-        Err(error) => {}
+        Err(_error) => {}
     }
 }

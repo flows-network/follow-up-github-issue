@@ -1,1 +1,1 @@
-# search for issues with key WASMEDGE, save findings to airtable
+# Scheduled searches for issues not commented in a given period on the target repo, reminder owner for actions

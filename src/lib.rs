@@ -8,7 +8,7 @@ use std::env::var;
 #[no_mangle]
 pub fn run() {
     schedule_cron_job(
-        String::from("30 * * * *"),
+        String::from("33 * * * *"),
         String::from("cron_job_evoked"),
         callback,
     );
@@ -29,7 +29,7 @@ async fn callback(_body: Vec<u8>) {
     let a_week_ago = now - Duration::hours(12);
     let a_week_ago_formatted = a_week_ago.format("%Y-%m-%d").to_string();
     let query = format!(
-        "repo:{owner}/{repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"
+        "repo:{owner}/{repo} is:issue state:open comments:0 updated:>={a_week_ago_formatted}"
     );
 
     let res = octocrab

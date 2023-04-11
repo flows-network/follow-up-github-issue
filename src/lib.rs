@@ -52,6 +52,5 @@ async fn callback(_body: Vec<u8>) {
 
             send_message_to_channel(&team, &channel, msg);
         }
-        send_message_to_channel(&team, &channel, query);
     }
 }

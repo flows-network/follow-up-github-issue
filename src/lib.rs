@@ -8,7 +8,7 @@ use std::env::var;
 #[no_mangle]
 pub fn run() {
     schedule_cron_job(
-        String::from("15 * * * *"),
+        String::from("25 * * * *"),
         String::from("cron_job_evoked"),
         callback,
     );

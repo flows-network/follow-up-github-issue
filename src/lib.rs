@@ -38,22 +38,20 @@ async fn callback(_body: Vec<u8>) {
         .send()
         .await;
 
-    match res {
-        Ok(page) => {
-            for item in page {
-                let title = item.title;
-                let html_url = item.html_url;
-                let time = item.created_at.format("%Y-%m-%d").to_string();
-                let msg = format!(
-                    r#"These issues call for your attention:
+    if let Ok(page) = res {
+        for item in page {
+            let title = item.title;
+            let html_url = item.html_url;
+            let time = item.created_at.format("%Y-%m-%d").to_string();
+            let msg = format!(
+                r#"These issues call for your attention:
                 {title}
                 {html_url}
                 created@{time}"#
-                );
+            );
 
-                send_message_to_channel(&team, &channel, msg);
-            }
+            send_message_to_channel(&team, &channel, msg);
         }
-        Err(_error) => {}
+        send_message_to_channel(&team, &channel, "Clocked".to_string());
     }
 }

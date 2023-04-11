@@ -3,7 +3,7 @@ use dotenv::dotenv;
 use github_flows::get_octo;
 use schedule_flows::schedule_cron_job;
 use slack_flows::send_message_to_channel;
-use std::env;
+use std::env::var;
 
 #[no_mangle]
 pub fn run() {
@@ -17,20 +17,11 @@ pub fn run() {
 async fn callback(_body: Vec<u8>) {
     dotenv().ok();
 
-    let login: String = match env::var("login") {
-        Err(_) => "jaykchen".to_string(),
-        Ok(name) => name,
-    };
-
-    let owner: String = match env::var("owner") {
-        Err(_) => "jaykchen".to_string(),
-        Ok(name) => name,
-    };
-
-    let repo: String = match env::var("repo") {
-        Err(_) => "a-test".to_string(),
-        Ok(name) => name,
-    };
+    let login = var("login").unwrap_or("jaykchen".to_string());
+    let owner = var("owner").unwrap_or("jaykchen".to_string());
+    let repo = var("repo").unwrap_or("a-test".to_string());
+    let team = var("team").unwrap_or("ik8".to_string());
+    let channel = var("channel").unwrap_or("ch_out".to_string());
 
     let octocrab = get_octo(Some(login));
 
@@ -60,7 +51,7 @@ async fn callback(_body: Vec<u8>) {
                 created@{time}"#
                 );
 
-                send_message_to_channel("ik8", "ch_out", msg);
+                send_message_to_channel(&team, &channel, msg);
             }
         }
         Err(_error) => {}

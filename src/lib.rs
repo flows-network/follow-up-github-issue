@@ -8,7 +8,7 @@ use std::env::var;
 #[no_mangle]
 pub fn run() {
     schedule_cron_job(
-        String::from("25 * * * *"),
+        String::from("30 * * * *"),
         String::from("cron_job_evoked"),
         callback,
     );
@@ -52,6 +52,6 @@ async fn callback(_body: Vec<u8>) {
 
             send_message_to_channel(&team, &channel, msg);
         }
-        send_message_to_channel(&team, &channel, "Clocked".to_string());
+        send_message_to_channel(&team, &channel, query);
     }
 }

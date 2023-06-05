@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 chrono = "0.4.24"
 dotenv = "0.15.0"
-github-flows = "0.4.0"
+github-flows = "0.5.1"
 schedule-flows = "0.1.10"
 slack-flows = "0.2.6"
 tokio_wasi = {version = "1.25.1", features = ["full"] }

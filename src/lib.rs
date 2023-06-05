@@ -1,14 +1,14 @@
 use chrono::{Duration, Utc};
 use dotenv::dotenv;
-use github_flows::get_octo;
+use github_flows::{get_octo, GithubLogin::Default};
 use schedule_flows::schedule_cron_job;
 use slack_flows::send_message_to_channel;
-use std::env::var;
+use std::env;
 
 #[no_mangle]
 pub fn run() {
     schedule_cron_job(
-        String::from("05 * * * *"),
+        String::from("* 12 * * *"),
         String::from("cron_job_evoked"),
         callback,
     );
@@ -17,19 +17,18 @@ pub fn run() {
 async fn callback(_body: Vec<u8>) {
     dotenv().ok();
 
-    let login = var("login").unwrap_or("jaykchen".to_string());
-    let owner = var("owner").unwrap_or("jaykchen".to_string());
-    let repo = var("repo").unwrap_or("a-test".to_string());
-    let team = var("team").unwrap_or("ik8".to_string());
-    let channel = var("channel").unwrap_or("ch_out".to_string());
+    let github_owner = env::var("github_owner").unwrap_or("alabulei1".to_string());
+    let github_repo = env::var("github_repo").unwrap_or("a-test".to_string());
+    let slack_workspace = env::var("slack_workspace").unwrap_or("secondstate".to_string());
+    let slack_channel = env::var("slack_channel").unwrap_or("github-status".to_string());
 
-    let octocrab = get_octo(Some(login));
+    let octocrab = get_octo(&Default);
 
     let now = Utc::now();
     let a_week_ago = now - Duration::days(7);
     let a_week_ago_formatted = a_week_ago.format("%Y-%m-%d").to_string();
     let query = format!(
-        "repo:{owner}/{repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"
+        "repo:{github_owner}/{github_repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"
     );
 
     let res = octocrab
@@ -50,7 +49,7 @@ async fn callback(_body: Vec<u8>) {
                 created@{time}"#
             );
 
-            send_message_to_channel(&team, &channel, msg);
+            send_message_to_channel(&slack_workspace, &slack_channel, msg);
         }
     }
 }

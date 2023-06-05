@@ -16,23 +16,22 @@ pub fn run() {
     schedule_cron_job(time_to_invoke, String::from("cron_job_evoked"), callback);
 }
 
-
 #[tokio::main(flavor = "current_thread")]
 async fn callback(_body: Vec<u8>) {
     let github_owner = env::var("github_owner").unwrap_or("alabulei1".to_string());
     let github_repo = env::var("github_repo").unwrap_or("a-test".to_string());
     let slack_workspace = env::var("slack_workspace").unwrap_or("secondstate".to_string());
     let slack_channel = env::var("slack_channel").unwrap_or("github-status".to_string());
+    let n_days = env::var("n_days").unwrap_or("7".to_string());
 
-    let octocrab = get_octo(&Default);
-
-    let now = Utc::now();
-    let a_week_ago = now - Duration::days(7);
-    let a_week_ago_formatted = a_week_ago.format("%Y-%m-%d").to_string();
+    let n_days_ago_formatted = Utc::now()
+        .checked_sub_signed(Duration::days(n_days.parse::<i64>().unwrap_or(7)))
+        .unwrap_or(Utc::now()).date_naive();
     let query = format!(
-        "repo:{github_owner}/{github_repo} is:issue state:open comments:0 updated:>{a_week_ago_formatted}"
+        "repo:{github_owner}/{github_repo} is:issue state:open comments:0 updated:>{n_days_ago_formatted}"
     );
 
+    let octocrab = get_octo(&Default);
     let res = octocrab
         .search()
         .issues_and_pull_requests(&query)

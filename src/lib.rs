@@ -10,7 +10,7 @@ pub fn run() {
     dotenv().ok();
     //time_to_invoke is a string of 3 numbers separated by spaces, representing minute, hour, and day
     //* is the spaceholder for non-specified numbers
-    let mut time_to_invoke = env::var("time_to_invoke").unwrap_or("* 12 *".to_string());
+    let mut time_to_invoke = env::var("time_to_invoke").unwrap_or("0 12 *".to_string());
     time_to_invoke.push_str(" * *");
 
     schedule_cron_job(time_to_invoke, String::from("cron_job_evoked"), callback);
